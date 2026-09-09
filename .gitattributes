@@ -1,0 +1,8 @@
+*.py text eol=lf
+*.lua text eol=lf
+*.tex text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+*.cjs text eol=lf
+*.yaml text eol=lf

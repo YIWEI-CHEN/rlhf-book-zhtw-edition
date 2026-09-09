@@ -1,0 +1,22 @@
+body { font-family: serif; line-height: 1.7; text-align: justify; }
+h1, h2, h3, h4 { text-align: left; line-height: 1.4; break-after: avoid; }
+h1 { font-size: 1.65em; margin: 1em 0; }
+h2 { font-size: 1.3em; margin-top: 1.8em; }
+h3 { font-size: 1.12em; }
+a { color: #146c70; text-decoration: underline; }
+p { margin: 0.7em 0; orphans: 2; widows: 2; }
+figure { margin: 1em 0; break-inside: avoid; text-align: center; }
+img { max-width: 100%; height: auto; }
+figcaption { text-align: left; font-size: 0.9em; line-height: 1.5; }
+blockquote { margin: 1em 0 1em 1em; padding-left: 0.8em; border-left: 0.2em solid #146c70; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.8em; text-align: left; }
+code { font-family: monospace; overflow-wrap: anywhere; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85em; }
+th, td { padding: 0.3em; border-bottom: 1px solid #aaa; text-align: left; }
+.equation { margin: 1.2em 0; text-align: center; overflow: auto; }
+.equation-number { display: block; text-align: right; font-size: 0.85em; }
+math { font-size: 0.95em; }
+.math-inline, .math-display { height: auto; max-width: 100%; }
+.math-display { margin: 0.4em auto; }
+.reference { font-size: 0.9em; text-align: left; overflow-wrap: anywhere; margin-bottom: 0.8em; }
+.titlepage { text-align: center; padding-top: 3em; }

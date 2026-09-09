@@ -14,9 +14,31 @@
 
 - [線上閱讀](https://yiwei-chen.github.io/rlhf-book-zh-tw/)：既有 HTML 網站，正體中文與互動網站基於 ai-twinkle；網站由另一個 repo 維護，與本 repo 不會自動同步。
 - [章節書稿](content/)：可直接在 GitHub 閱讀或下載修改，插圖存放於 `content/figures/`。
-- PDF／EPUB：尚未提供。第一個預定版本為 **`v0.1`**，下載檔名將使用 `rlhf-book-zh-tw-v0.1.pdf` 與 `rlhf-book-zh-tw-v0.1.epub`。
+- PDF／EPUB：已加入本機建置工具，第一版為 **`v0.1`**。輸出檔名為 `rlhf-book-zh-tw-v0.1.pdf` 與 `rlhf-book-zh-tw-v0.1.epub`；公開下載檔案以 [Releases](https://github.com/YIWEI-CHEN/rlhf-book-zhtw-edition/releases) 實際發布內容為準。
 
-本 repo 目前沒有 `webapp/`、`build.py` 或 PDF／EPUB 建置工具，也尚未匯入官方 `code/`。後續匯入程式碼時，保留原英文 `README.md`，另寫 `README.zh-TW.md`。
+本 repo 不包含 `webapp/` 或 `build.py`，也尚未匯入官方 `code/`。後續匯入程式碼時，保留原英文 `README.md`，另寫 `README.zh-TW.md`。
+
+## 產生 PDF 與 EPUB
+
+需要 Python 3.10+、Node.js 18+ 與 XeLaTeX。Windows 可使用 MiKTeX；安裝與其他平台說明見 [電子書建置指南](docs/EXPORT.md)。
+
+```powershell
+# 首次準備：下載固定版本的工具與字型至本機 .tools/
+python scripts/bootstrap_tools.py
+
+# 書稿修改後：同時產生兩種格式
+python scripts/export_book.py
+```
+
+輸出位置：
+
+- `output/pdf/rlhf-book-zh-tw-v0.1.pdf`
+- `output/epub/rlhf-book-zh-tw-v0.1.epub`
+- `output/build-provenance.json`：建置 commit、內容雜湊、來源 SHA 與工具版本。
+
+兩種格式都包含目錄、文獻與公式跳轉、來源說明及授權條款。PDF 使用內嵌正體中文字型；EPUB 使用離線 SVG 公式，不依賴閱讀器執行 JavaScript。EPUB 的字型與分頁由閱讀器決定，長公式建議使用橫向畫面或較大螢幕；公式替代文字保留 TeX，尚未提供完整的語音數學朗讀。
+
+輸出檔、下載工具及本機協作規則不納入 Git。公開發布前，請執行指南中的自動檢查及視覺抽查。
 
 ## 內容版本
 
@@ -29,7 +51,7 @@
 
 以上 SHA 用於標示內容出處，不會匯入其 Git 歷史。此次整理僅搬移插圖並調整 Markdown 圖片路徑；既有正文不因重新建庫而改寫。PDF 的第一階段以這份正體中文內容為準，不宣稱已追平最新英文版。
 
-`content/ch06.md` 是第 6 章完整內容；`ch06a.md`、`ch06b.md` 是保留的分段稿，未來編排電子書時不得重複收錄。
+`content/ch06.md` 是第 6 章完整內容；`ch06a.md`、`ch06b.md` 是保留的分段稿，電子書不重複收錄。章節順序與版本集中記錄於 [book.json](book.json)。
 
 ## 參與修訂
 

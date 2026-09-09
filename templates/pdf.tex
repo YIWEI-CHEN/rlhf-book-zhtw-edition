@@ -1,0 +1,74 @@
+\documentclass[11pt,a4paper,oneside]{book}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec,xeCJK,unicode-math}
+\setmainfont{texgyrepagella-regular.otf}[BoldFont=texgyrepagella-bold.otf,
+  ItalicFont=texgyrepagella-italic.otf,BoldItalicFont=texgyrepagella-bolditalic.otf]
+\setsansfont{texgyreheros-regular.otf}[BoldFont=texgyreheros-bold.otf]
+\setmonofont{lmmono10-regular.otf}[Scale=0.85]
+\setmathfont{latinmodern-math.otf}
+\setCJKmainfont[Path=$font-dir$/,
+  BoldFont=NotoSerifCJKtc-Bold.otf,
+  ItalicFont=NotoSerifCJKtc-Regular.otf,
+  BoldItalicFont=NotoSerifCJKtc-Bold.otf]{NotoSerifCJKtc-Regular.otf}
+\setCJKsansfont[Path=$font-dir$/,BoldFont=NotoSerifCJKtc-Bold.otf]{NotoSerifCJKtc-Regular.otf}
+\setCJKmonofont[Path=$font-dir$/]{NotoSerifCJKtc-Regular.otf}
+\usepackage[margin=22mm,headheight=16pt]{geometry}
+\usepackage{longtable,booktabs,array,calc,graphicx,adjustbox,xcolor}
+\usepackage{fvextra,enumitem,caption,float,fancyhdr,xurl,hyperref,bookmark}
+\floatplacement{figure}{H}
+\definecolor{BookTeal}{HTML}{146C70}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=BookTeal,urlcolor=BookTeal,
+  pdftitle={$title$},pdfauthor={$author$}}
+\setcounter{secnumdepth}{-2}
+\setcounter{tocdepth}{1}
+\renewcommand{\contentsname}{目錄}
+\renewcommand{\figurename}{圖}
+\renewcommand{\tablename}{表}
+\captionsetup{labelformat=empty,font=small,justification=justified}
+% Pandoc marks uncaptioned longtables with LTcaptype=none.
+\newcounter{none}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\linespread{1.25}
+\setlength{\emergencystretch}{3em}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\passthrough}[1]{#1}
+\providecommand{\pandocbounded}[1]{\begin{adjustbox}{max width=\linewidth,max totalheight=0.65\textheight,keepaspectratio}#1\end{adjustbox}}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true,fontsize=\small}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily RLHF · 正體中文翻譯 (非官方)}
+\fancyhead[R]{\small $edition$}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\begin{document}
+\begin{titlepage}
+\color{BookTeal}\sffamily
+\vspace*{12mm}
+{\Large REINFORCEMENT LEARNING}\par
+{\Large FROM HUMAN FEEDBACK}\par
+\vspace{14mm}
+{\fontsize{45}{54}\selectfont\bfseries RLHF}\par
+\vspace{8mm}
+{\fontsize{25}{36}\selectfont\bfseries 從人類回饋中強化學習}\par
+\vspace{5mm}
+{\LARGE 增修版}\par
+\vspace{12mm}
+\rule{\linewidth}{1.2pt}\par
+\vspace{6mm}\color{black}
+{\large 正體中文翻譯 (非官方)}\par
+\vfill
+原書：Nathan Lambert 與貢獻者\par
+正體中文翻譯：Twinkle AI Community\par
+增修與電子書製作：Yi-Wei Chen\par
+\vspace{8mm}
+$edition$ · $date$\par
+\vspace{4mm}
+{\small CC BY-NC-SA 4.0}\par
+\end{titlepage}
+\frontmatter
+\tableofcontents
+\mainmatter
+$body$
+\end{document}

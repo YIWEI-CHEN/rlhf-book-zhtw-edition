@@ -1,0 +1,11 @@
+{
+  "name": "rlhf-zhtw-epub-math",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "mathjax-full": "3.2.2"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "0.9.12"
+  }
+}

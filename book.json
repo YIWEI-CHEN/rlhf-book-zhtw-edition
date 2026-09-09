@@ -1,0 +1,20 @@
+{
+  "title": "RLHF - 從人類回饋中強化學習 (增修版)",
+  "version": "v0.1",
+  "language": "zh-TW",
+  "author": "Nathan Lambert 與貢獻者",
+  "translator": "Twinkle AI Community",
+  "editor": "Yi-Wei Chen",
+  "website": "https://yiwei-chen.github.io/rlhf-book-zh-tw/",
+  "translation_commit": "41834be9275d000a864e275a7347e7e13941536e",
+  "imported_revision": "9a27262290854adb9cab5515916591965600af5d",
+  "english_edition_date": "2026-07-01",
+  "english_candidate_release": "book/v0.10",
+  "english_candidate_commit": "854a344dc316f4c147280a3448c31cd97d953b6d",
+  "english_translation_match": "unverified",
+  "chapters": [
+    "ch01", "ch02", "ch03", "ch04", "ch05", "ch06", "ch07", "ch08",
+    "ch09", "ch10", "ch11", "ch12", "ch13", "ch14", "ch15", "ch16", "ch17",
+    "appa", "appb", "appc", "bibliography"
+  ]
+}
