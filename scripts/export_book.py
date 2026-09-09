@@ -171,34 +171,21 @@ def provenance(config: dict) -> dict:
 
 
 def frontmatter(config: dict, info: dict) -> str:
-    state = "（含尚未提交的建置修改）" if info["working_tree_dirty"] else ""
     return f'''# 關於本版 {{#edition-notes}}
 
-本書為《Reinforcement Learning from Human Feedback》的正體中文翻譯與增修版本，並非原作者或翻譯社群的官方出版品。
+本書為《Reinforcement Learning from Human Feedback》的中文翻譯與增修版本，並非原作者或翻譯社群的官方出版品。
 
-- **原書**：Nathan Lambert 與貢獻者，[natolambert/rlhf-book](https://github.com/natolambert/rlhf-book)。
-- **正體中文翻譯**：Twinkle AI Community，[ai-twinkle/rlhf-book-zh-tw](https://github.com/ai-twinkle/rlhf-book-zh-tw)。
+- **原著**：Nathan Lambert，[natolambert/rlhf-book](https://github.com/natolambert/rlhf-book)。
+- **中文翻譯**：[Twinkle AI Community](https://github.com/ai-twinkle/rlhf-book-zh-tw)。
 - **增修與電子書製作**：[Yi-Wei Chen](https://yiwei-chen.github.io/)。
-- **版本**：{config["version"]}；建置日期：{info["build_date"]}。
-- **授權**：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant)，保留署名、非商業使用、相同方式分享。
+- **版本**：{config["version"]}；輸出日期：{info["build_date"]}。
+- **授權**：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant)。
 
-本版以既有正體中文內容為基礎，加入電子書排版、文獻與公式跳轉。原翻譯宣告依據為 {config["english_edition_date"]} 版；英文來源可能對應 {config["english_candidate_release"]}，但精確對應**尚未確認**，不宣稱已同步最新英文內容。
+本版以 [Twinkle AI Community](https://github.com/ai-twinkle/rlhf-book-zh-tw) 內容為基礎，加入電子書排版、文獻與公式跳轉。
 
-本書保留原有章節、插圖與公式編號。網頁互動實驗不嵌入電子書，可至[既有線上閱讀網站]({config["website"]})使用；網站與電子書的更新可能不同步。第 6 章只收錄完整稿，不重複收錄分段稿。
+本書保留原有章節、插圖與公式編號。網頁互動實驗不嵌入電子書，可至[線上閱讀網站]({config["website"]})使用；網站與電子書的更新可能不同步。
 
-## 來源紀錄
-
-增修書稿 commit{state}：\n\n`{info["source_commit"]}`
-
-正體中文內容 SHA-256：\n\n`{info["content_sha256"]}`
-
-翻譯基底 commit：\n\n`{config["translation_commit"]}`
-
-沿用的增修快照 commit：\n\n`{config["imported_revision"]}`
-
-英文候選版本 commit（非已確認翻譯基底）：\n\n`{config["english_candidate_commit"]}`
-
-完整授權條款隨本書附於最後一節。支持原作者請至 [rlhfbook.com](https://rlhfbook.com) 購買實體書。
+支持原作者請至 [rlhfbook.com](https://rlhfbook.com) 購買實體書。
 
 '''
 
@@ -221,19 +208,6 @@ def prepare(config: dict, info: dict) -> tuple[str, dict]:
     for chapter in chapters[:-1]:
         parts.append(prepare_chapter(sources[chapter], chapter, set(entries), set(numbers)))
     parts.append(bibliography_markdown(entries))
-    license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
-    # ASCII decorative rules are not license terms; render them as page-width rules.
-    license_text = re.sub(r"(?m)^={5,}$", "\n---\n", license_text)
-    parts.append("# 授權條款 {#license}\n\n" + license_text)
-    notices = (ROOT / "licenses" / "README.md").read_text(encoding="utf-8")
-    notices = notices.replace("# 電子書工具與字型署名", "# 電子書工具與字型署名 {#third-party-notices}")
-    parts.append(notices)
-    for title, filename in [("Noto 字型：SIL Open Font License 1.1", "Noto-OFL-1.1.txt"),
-                            ("MathJax：Apache License 2.0", "MathJax-APACHE-2.0.txt")]:
-        terms = (ROOT / "licenses" / filename).read_text(encoding="utf-8")
-        # Strip presentation indentation to avoid treating the entire license as code.
-        terms = "\n".join(line.lstrip() for line in terms.splitlines())
-        parts.append(f"## {title}\n\n{terms}")
     stats = {"chapters": chapters, "references": len(entries), "numbered_equations": len(numbers),
              "equation_numbers": sorted(numbers)}
     return "\n\n".join(parts), stats
@@ -343,7 +317,8 @@ def main() -> int:
     ast = json.loads(run([pandoc, str(manuscript), "--from",
                          "markdown+east_asian_line_breaks+autolink_bare_uris-smart", "--to", "json"]))
     info["inventory"]["math_expressions"] = sum(n.get("t") == "Math" for n in iter_visible_nodes(ast))
-    metadata = {"title": config["title"], "subtitle": f'正體中文翻譯 (非官方) · {config["version"]}',
+    metadata = {"title": config["title"], "subtitle": config["subtitle"],
+                "translator": config["translator"], "editor": config["editor"],
                 "author": config["author"], "date": info["build_date"], "toc-title": "目錄",
                 "lang": config["language"], "rights": "CC BY-NC-SA 4.0",
                 "identifier": f'urn:rlhf-book-zhtw-edition:{config["version"]}:{info["content_sha256"]}',

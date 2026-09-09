@@ -46,17 +46,17 @@ python scripts/export_book.py --prepare-only # 只組稿並檢查編號
 | `output/build-provenance.json` | 本次建置來源、整個 content 目錄雜湊、工具版本與內容統計 |
 | `tmp/pdfs/` | 中間 Markdown、Pandoc JSON、LaTeX、SVG 與 QA 圖片 |
 
-建置日期使用 UTC；可設定 `SOURCE_DATE_EPOCH` 固定文件日期。這不保證不同 TeX／作業系統環境的輸出位元組完全相同。若工作目錄有未提交的修改，書內來源頁會明確標示。
+輸出日期使用 UTC；可設定 `SOURCE_DATE_EPOCH` 固定文件日期。這不保證不同 TeX／作業系統環境的輸出位元組完全相同。來源版本、內容雜湊與工作目錄是否有未提交修改，記錄於 `output/build-provenance.json`，不列入書內。
 
 `build-provenance.json` 描述**最近一次成功執行的建置**。發布兩種格式前務必執行預設的完整建置，再驗證，不混用不同時間的單一格式輸出。
 
 ## 3. 內容如何轉換
 
-- 收錄第 1–17 章、附錄 A–C、參考文獻；第 6 章只用完整 `ch06.md`，不加入 `ch06a.md`／`ch06b.md`。輸出時移除合併稿中重複的第 6 章標題及每章舊來源註記，統一記錄在書首。
+- 收錄第 1–17 章、附錄 A–C、參考文獻；第 6 章只用完整 `ch06.md`，不加入 `ch06a.md`／`ch06b.md`。輸出時移除合併稿中重複的第 6 章標題及每章舊來源註記，來源版本記錄於 README 與建置紀錄。
 - 保留既有的 409 筆參考文獻、158 個公式編號與插圖內容，不重新編號。引用 `[N]` 及「式 N」變成內部連結；不重寫程式碼、數學內容或既有 Markdown 連結。DOI 條目增加可跳轉 URL。
 - PDF 交由 Pandoc 與 XeLaTeX 排版；EPUB 公式由 MathJax 轉為內嵌 SVG，避免閱讀器不支援 MathML 而顯示原始 TeX。SVG 使用局部字形快取，離線可用；原始 TeX 保留在替代文字中。
 - 電子書不包含網站的互動實驗。PDF／EPUB 與既有 Pages 是不同發布管線，不會自動同步。
-- 原授權條款完整附於書末；ASCII 分隔線只轉成適合頁寬的橫線。另附字型與公式工具署名及相應授權。
+- 書內〈關於本版〉保留授權連結；完整授權條款與工具、字型署名保留於 repo 的 `LICENSE` 與 `licenses/`，不另收錄為電子書章節。
 
 ## 4. 測試與發布檢查
 
