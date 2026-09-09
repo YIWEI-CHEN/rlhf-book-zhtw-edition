@@ -90,14 +90,15 @@ def pdf_checks(path: Path, inventory: dict, render: bool) -> dict:
     links = 0
     example_citation = False
     for number, page in enumerate(document):
+        textpage = page.get_textpage()
         for link in page.get_links():
             links += 1
             if link["kind"] in (pymupdf.LINK_GOTO, pymupdf.LINK_NAMED):
                 require(0 <= link.get("page", -1) < len(document), f"Broken PDF link on page {number + 1}")
-                if page.get_textbox(link["from"]).strip() == "[111]":
+                if page.get_textbox(link["from"], textpage=textpage).strip() == "[111]":
                     require("Ahmadian" in pages[link["page"]], "Citation [111] points to wrong page")
                     example_citation = True
-        for x0, y0, x1, y1, text, *_ in page.get_text("blocks"):
+        for x0, y0, x1, y1, text, *_ in page.get_text("blocks", textpage=textpage):
             # 40pt safety region allows CJK hanging punctuation, but catches clipped rules/URLs.
             require(40 <= x0 <= x1 <= page.rect.width - 40 and y0 >= 10 and y1 <= page.rect.height - 10,
                     f"PDF text overflow on page {number + 1}: {text[:80]}")
@@ -122,6 +123,33 @@ def pdf_checks(path: Path, inventory: dict, render: bool) -> dict:
             "references": len(labels), "numbered_equations": len(inventory["equation_numbers"])}
 
 
+def epub_layout_checks(path: Path, render: bool) -> dict:
+    import pymupdf
+    document = pymupdf.open(path)
+    directory = ROOT / "tmp/pdfs/qa"
+    if render:
+        directory.mkdir(parents=True, exist_ok=True)
+    checked = 0
+    for number, page in enumerate(document):
+        blocks = page.get_text("dict")["blocks"]
+        images = [pymupdf.Rect(block["bbox"]) for block in blocks if block["type"] == 1
+                  and block["bbox"][3] - block["bbox"][1] > 35
+                  and block["bbox"][2] - block["bbox"][0] > 120]
+        for image in images:
+            checked += 1
+            for block in blocks:
+                if block["type"] != 0:
+                    continue
+                for line in block["lines"]:
+                    overlap = image & pymupdf.Rect(line["bbox"])
+                    require(overlap.height <= 3 or overlap.width <= 5,
+                            f"EPUB large image/formula overlaps text on reflow page {number + 1}")
+        if render and (number == 0 or any(f"({n})" in page.get_text().splitlines() for n in (15, 57, 78, 80, 81))):
+            page.get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).save(directory / f"epub-{number + 1:03}.png")
+    return {"reader": f"MuPDF {pymupdf.VersionBind}", "viewport": "400x600 default",
+            "large_images_checked": checked, "large_image_text_overlaps": 0}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--render", action="store_true", help="Render representative PDF pages for visual review")
@@ -139,6 +167,7 @@ def main():
     report = {"epub": epub_checks(paths["epub"], provenance["inventory"]),
               "pdf": pdf_checks(paths["pdf"], provenance["inventory"], args.render),
               "source_commit": provenance["source_commit"], "visual_review": "manual review required; not implied by automated checks"}
+    report["epub"]["reflow_check"] = epub_layout_checks(paths["epub"], args.render)
     for format, path in paths.items():
         report[format]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         report[format]["bytes"] = path.stat().st_size

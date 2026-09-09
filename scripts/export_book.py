@@ -276,6 +276,17 @@ def iter_visible_nodes(node):
             yield from iter_visible_nodes(value)
 
 
+def math_image_style(size: dict, display: bool) -> str:
+    if display:
+        # A negative/middle baseline can make reflow readers reserve only half
+        # a multi-line formula's height. Keep display math on a full baseline.
+        scale = min(1, 27 / size["width"])
+        return (f'width:{size["width"] * scale:.4f}em;'
+                f'height:{size["height"] * scale:.4f}em;'
+                'vertical-align:baseline;max-width:100%')
+    return f'width:{size["width"]:.4f}em;vertical-align:{size["baseline"]:.4f}em'
+
+
 def render_epub_math(ast: dict) -> int:
     formulas = {}
     for node in iter_visible_nodes(ast):
@@ -301,7 +312,7 @@ def render_epub_math(ast: dict) -> int:
         identifier = hashlib.sha256(f"{display}:{tex}".encode()).hexdigest()[:24]
         size = dimensions[identifier]
         classes = ["math-display" if display else "math-inline"]
-        style = f'width:{size["width"]:.4f}em;vertical-align:{size["baseline"]:.4f}em'
+        style = math_image_style(size, display)
         node.update({"t": "Image", "c": [["", classes, [["style", style]]],
                     [{"t": "Str", "c": tex}], [(directory / f"{identifier}.svg").as_posix(), ""]]})
         count += 1

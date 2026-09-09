@@ -29,7 +29,8 @@ for (const item of manifest) {
   dimensions[item.id] = {width, height, baseline: alignment ? Number(alignment[1]) / 2 : 0};
   // Absolute intrinsic dimensions also work in readers that ignore CSS em units.
   xml = xml.replace(/width="[^"]+"/, `width="${width * 16}px"`)
-           .replace(/height="[^"]+"/, `height="${height * 16}px"`);
+           .replace(/height="[^"]+"/, `height="${height * 16}px"`)
+           .replace(/ style="[^"]*"/, '');
   const escaped = item.tex.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   xml = xml.replace(/(<svg\b[^>]*>)/, `$1<title>${escaped}</title>`);
   fs.writeFileSync(path.join(directory, `${item.id}.svg`), xml, 'utf8');

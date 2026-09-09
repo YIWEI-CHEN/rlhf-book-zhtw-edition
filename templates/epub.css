@@ -17,6 +17,6 @@ th, td { padding: 0.3em; border-bottom: 1px solid #aaa; text-align: left; }
 .equation-number { display: block; text-align: right; font-size: 0.85em; }
 math { font-size: 0.95em; }
 .math-inline, .math-display { height: auto; max-width: 100%; }
-.math-display { margin: 0.4em auto; }
+.math-display { margin: 0.4em auto; vertical-align: baseline; }
 .reference { font-size: 0.9em; text-align: left; overflow-wrap: anywhere; margin-bottom: 0.8em; }
 .titlepage { text-align: center; padding-top: 3em; }

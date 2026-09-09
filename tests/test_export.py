@@ -81,6 +81,13 @@ class ManuscriptTests(unittest.TestCase):
         self.assertEqual(sum(n.get('t') == 'Math' for n in book.iter_nodes(figure)), 2)
         self.assertEqual(sum(n.get('t') == 'Math' for n in book.iter_visible_nodes(figure)), 1)
 
+    def test_multiline_math_reserves_full_height(self):
+        size = {'width': 54, 'height': 20, 'baseline': -10}
+        style = book.math_image_style(size, True)
+        self.assertIn('width:27.0000em;height:10.0000em', style)
+        self.assertIn('vertical-align:baseline', style)
+        self.assertIn('vertical-align:-10.0000em', book.math_image_style(size, False))
+
 
 if __name__ == '__main__':
     unittest.main()
