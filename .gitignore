@@ -1,0 +1,9 @@
+# Local agent instructions must never be committed.
+[Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]
+
+# Local tools and generated files.
+.codex/
+.claude/
+__pycache__/
+*.pyc
+.DS_Store
