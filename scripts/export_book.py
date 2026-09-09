@@ -318,6 +318,7 @@ def main() -> int:
                          "markdown+east_asian_line_breaks+autolink_bare_uris-smart", "--to", "json"]))
     info["inventory"]["math_expressions"] = sum(n.get("t") == "Math" for n in iter_visible_nodes(ast))
     metadata = {"title": config["title"], "subtitle": config["subtitle"],
+                "english-title": config["english_title"], "english-subtitle": config["english_subtitle"],
                 "translator": config["translator"], "editor": config["editor"],
                 "author": config["author"], "date": info["build_date"], "toc-title": "目錄",
                 "lang": config["language"], "rights": "CC BY-NC-SA 4.0",

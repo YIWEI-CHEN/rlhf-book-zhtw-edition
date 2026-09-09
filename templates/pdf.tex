@@ -17,6 +17,9 @@
 \usepackage{fvextra,enumitem,caption,float,fancyhdr,xurl,hyperref,bookmark}
 \floatplacement{figure}{H}
 \definecolor{BookTeal}{HTML}{146C70}
+\definecolor{CoverInk}{HTML}{172C38}
+\definecolor{CoverMuted}{HTML}{5B6970}
+\definecolor{CoverRule}{HTML}{CBD4D5}
 \hypersetup{unicode=true,colorlinks=true,linkcolor=BookTeal,urlcolor=BookTeal,
   pdftitle={$title$},pdfauthor={$author$}}
 \setcounter{secnumdepth}{-2}
@@ -42,28 +45,48 @@
 \fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
 \begin{document}
 \begin{titlepage}
-\color{BookTeal}\sffamily
-\vspace*{12mm}
-{\Large REINFORCEMENT LEARNING}\par
-{\Large FROM HUMAN FEEDBACK}\par
-\vspace{14mm}
-{\fontsize{45}{54}\selectfont\bfseries RLHF}\par
-\vspace{8mm}
-{\fontsize{25}{36}\selectfont\bfseries 從人類回饋中強化學習}\par
-\vspace{5mm}
-{\LARGE 增修版}\par
-\vspace{12mm}
-\rule{\linewidth}{1.2pt}\par
-\vspace{6mm}\color{black}
-{\large $subtitle$}\par
-\vfill
-作者：$author$\par
-譯者：$translator$\par
-增修與電子書製作：$editor$\par
-\vspace{8mm}
-$edition$ · $date$\par
+\thispagestyle{empty}
+\raggedright\color{CoverInk}\sffamily
+\linespread{1}\selectfont
+\setlength{\parskip}{0pt}
+\vspace*{8mm}
+{\color{BookTeal}\rule{18mm}{2pt}}\par
+\vspace{9mm}
+{\fontsize{86}{90}\selectfont\bfseries RLHF}\par
+\vspace{6mm}
+{\fontsize{28}{38}\selectfont\bfseries 從人類回饋中強化學習}\par
 \vspace{4mm}
-{\small CC BY-NC-SA 4.0}\par
+{\fontsize{13}{20}\selectfont\color{CoverMuted}$subtitle$}\par
+\vspace{6mm}
+{\fontsize{10}{14}\selectfont\color{BookTeal}增修版}\par
+\vspace{17mm}
+\begin{minipage}{110mm}
+\raggedright
+{\rmfamily\fontsize{24}{29}\selectfont $english-title$\par}
+\vspace{4mm}
+{\sffamily\fontsize{11}{16}\selectfont\color{CoverMuted}$english-subtitle$\par}
+\end{minipage}\par
+\vfill
+{\fontsize{9}{13}\selectfont\color{CoverMuted}作者}\par
+\vspace{2mm}
+{\fontsize{18}{24}\selectfont $author$}\par
+\vspace{8mm}
+\begin{minipage}[t]{0.52\linewidth}
+{\fontsize{9}{13}\selectfont\color{CoverMuted}譯者}\par
+\vspace{2mm}
+{\fontsize{11}{16}\selectfont $translator$}\par
+\end{minipage}%
+\begin{minipage}[t]{0.48\linewidth}
+{\fontsize{9}{13}\selectfont\color{CoverMuted}增修與電子書製作}\par
+\vspace{2mm}
+{\fontsize{11}{16}\selectfont $editor$}\par
+\end{minipage}\par
+\vspace{9mm}
+{\color{CoverRule}\rule{\linewidth}{0.4pt}}\par
+\vspace{3mm}
+{\fontsize{8}{12}\selectfont\color{CoverMuted}%
+$edition$\quad /\quad $date$\hfill CC BY-NC-SA 4.0}\par
+\vspace*{2mm}
 \end{titlepage}
 \frontmatter
 \tableofcontents

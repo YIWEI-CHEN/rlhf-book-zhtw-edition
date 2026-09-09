@@ -1,6 +1,8 @@
 {
   "title": "RLHF - 從人類回饋中強化學習 (增修版)",
   "subtitle": "語言模型的 RLHF 與後訓練指南",
+  "english_title": "Reinforcement Learning from Human Feedback",
+  "english_subtitle": "A short introduction to RLHF and post-training focused on language models.",
   "version": "v0.1",
   "language": "zh-TW",
   "author": "Nathan Lambert",
