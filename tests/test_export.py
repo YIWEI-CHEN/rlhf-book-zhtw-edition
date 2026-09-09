@@ -63,8 +63,13 @@ class ManuscriptTests(unittest.TestCase):
         self.assertEqual(len(stats['chapters']), 21)
         self.assertNotIn('ch06a', stats['chapters'])
         self.assertEqual(manuscript.count('{#ch06}'), 1)
+        self.assertLess(manuscript.index('{#ch17}'), manuscript.index('{#bibliography}'))
+        self.assertLess(manuscript.index('{#bibliography}'), manuscript.index('{#appa}'))
+        self.assertLess(manuscript.index('{#appa}'), manuscript.index('{#appb}'))
+        self.assertLess(manuscript.index('{#appb}'), manuscript.index('{#appc}'))
         self.assertIn('A. Ahmadian', manuscript)
-        self.assertIn('尚未確認', manuscript)
+        self.assertNotIn('{#license}', manuscript)
+        self.assertNotIn('{#third-party-notices}', manuscript)
 
     def test_epub_equation_preserves_number_outside_math(self):
         node = {'t': 'Div', 'c': [['eq-80', ['equation'], [['data-number', '80']]],

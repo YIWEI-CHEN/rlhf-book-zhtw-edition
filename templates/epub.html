@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"$if(lang)$ lang="$lang$" xml:lang="$lang$"$endif$>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>$pagetitle$</title>
+$for(css)$
+  <link rel="stylesheet" type="text/css" href="$css$" />
+$endfor$
+</head>
+<body$if(body-type)$ epub:type="$body-type$"$endif$>
+$if(titlepage)$
+<section epub:type="titlepage" class="titlepage">
+  <div class="cover-rule"></div>
+  <h1 class="title"><span class="cover-acronym">RLHF</span><span class="cover-chinese">從人類回饋中強化學習</span></h1>
+  <p class="subtitle">$subtitle$</p>
+  <p class="cover-edition">增修版</p>
+  <p class="cover-english" lang="en" xml:lang="en">$english-title$</p>
+  <p class="cover-description" lang="en" xml:lang="en">$english-subtitle$</p>
+  <div class="cover-credits">
+    <p class="cover-author"><span class="credit-label">作者</span>$author$</p>
+    <div class="cover-credit"><span class="credit-label">譯者</span>$translator$</div>
+    <div class="cover-credit"><span class="credit-label">增修與電子書製作</span>$editor$</div>
+  </div>
+  <p class="cover-meta">$edition$ · $date$<br />$rights$</p>
+</section>
+$else$
+$for(include-before)$
+$include-before$
+$endfor$
+$body$
+$for(include-after)$
+$include-after$
+$endfor$
+$endif$
+</body>
+</html>

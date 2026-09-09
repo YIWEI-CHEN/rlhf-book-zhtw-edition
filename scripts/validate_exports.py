@@ -21,7 +21,22 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def epub_checks(path: Path, inventory: dict) -> dict:
+def presentation_checks(config: dict, cover: str, notes: str, urls: set[str]):
+    compact = lambda text: re.sub(r"\s+", "", text)
+    for text in ("RLHF", "從人類回饋中強化學習", config["subtitle"], config["english_title"],
+                 config["english_subtitle"], "作者", config["author"], "譯者", config["translator"], config["editor"]):
+        require(compact(text) in compact(cover), f"Cover text missing: {text}")
+    for text in ("正體中文翻譯", "非官方", "與貢獻者"):
+        require(compact(text) not in compact(cover), f"Obsolete cover text: {text}")
+    for text in ("原著", "中文翻譯", "輸出日期", "CC BY-NC-SA 4.0"):
+        require(compact(text) in compact(notes), f"Edition note missing: {text}")
+    for text in ("來源紀錄", "建置日期", "原翻譯宣告依據", "精確對應", "既有線上閱讀網站",
+                 "第 6 章只收錄完整稿", "完整授權條款隨本書附於最後一節", "保留署名、非商業使用、相同方式分享"):
+        require(compact(text) not in compact(notes), f"Obsolete edition note: {text}")
+    require("https://apps.twinkleai.tw/rlhf-book-zh-tw/" in urls, "Twinkle website link missing")
+
+
+def epub_checks(path: Path, inventory: dict, config: dict) -> dict:
     with zipfile.ZipFile(path) as bundle:
         require(bundle.testzip() is None, "EPUB ZIP CRC failed")
         require(bundle.namelist()[0] == "mimetype", "EPUB mimetype must be first")
@@ -36,8 +51,33 @@ def epub_checks(path: Path, inventory: dict) -> dict:
             ids[name] = set(values)
             if name.endswith(".xhtml"):
                 all_ids.update(values)
-        for identifier in inventory["chapters"] + ["edition-notes", "license"]:
+        for identifier in inventory["chapters"] + ["edition-notes"]:
             require(all_ids[identifier] == 1, f"Chapter ID missing/duplicated: {identifier}")
+        require(not all_ids["license"] and not all_ids["third-party-notices"], "Removed back-matter chapters were included")
+        container = ET.fromstring(bundle.read("META-INF/container.xml"))
+        package_path = next(element.attrib["full-path"] for element in container.iter()
+                            if element.tag.endswith("}rootfile"))
+        package = ET.fromstring(bundle.read(package_path))
+        manifest = {element.attrib["id"]: posixpath.normpath(posixpath.join(posixpath.dirname(package_path), element.attrib["href"]))
+                    for element in package.iter() if element.tag.endswith("}item")}
+        spine = [manifest[element.attrib["idref"]] for element in package.iter() if element.tag.endswith("}itemref")]
+        chapter_order = [element.attrib["id"] for name in spine for element in documents[name].iter()
+                         if element.attrib.get("id") in inventory["chapters"]]
+        require(chapter_order == inventory["chapters"], "EPUB reading order differs from the chapter manifest")
+        titlepage = next(element for tree in documents.values() for element in tree.iter()
+                         if element.tag.endswith("}section")
+                         and element.attrib.get("{http://www.idpf.org/2007/ops}type") == "titlepage")
+        notes = next(tree for name, tree in documents.items() if "edition-notes" in ids[name])
+        presentation_checks(config, " ".join(titlepage.itertext()), " ".join(notes.itertext()),
+                            {element.attrib["href"] for element in notes.iter() if "href" in element.attrib})
+        navigation = next(element for tree in documents.values() for element in tree.iter()
+                          if element.tag.endswith("}nav")
+                          and element.attrib.get("{http://www.idpf.org/2007/ops}type") == "toc")
+        nav_labels = [" ".join(element.itertext()).strip() for element in navigation.iter() if element.tag.endswith("}a")]
+        require(any(label.startswith("1.6.1 ") for label in nav_labels), "EPUB TOC is missing third-level sections")
+        require(not any(label.startswith("1.6.1.1 ") for label in nav_labels), "EPUB TOC includes unwanted fourth level")
+        require(all("原著內容依" not in " ".join(tree.itertext()) for name, tree in documents.items()
+                    if name.endswith(".xhtml")), "Obsolete chapter license note")
         require(not all_ids["ch06a"] and not all_ids["ch06b"], "Split chapter 6 was included")
         for number in range(1, inventory["references"] + 1):
             require(all_ids[f"bib-{number}"] == 1, f"Bibliography target missing: {number}")
@@ -78,15 +118,29 @@ def epub_checks(path: Path, inventory: dict) -> dict:
             "epubcheck": "5.3.0: 0 errors, 0 warnings"}
 
 
-def pdf_checks(path: Path, inventory: dict, render: bool) -> dict:
+def pdf_checks(path: Path, inventory: dict, render: bool, config: dict) -> dict:
     import pymupdf
     document = pymupdf.open(path)
     require(not document.is_encrypted, "PDF unexpectedly encrypted")
     toc = document.get_toc()
-    require(len([entry for entry in toc if entry[0] == 1]) == len(inventory["chapters"]) + 3,
+    require(len([entry for entry in toc if entry[0] == 1]) == len(inventory["chapters"]) + 1,
             "PDF chapter bookmarks missing/duplicated")
+    require(any(entry[0] == 3 and entry[1].startswith("1.6.1 ") for entry in toc), "PDF TOC is missing third-level sections")
+    require(max(entry[0] for entry in toc) == 3, "Unexpected PDF bookmark depth")
     pages = [page.get_text() for page in document]
     require(all("\ufffd" not in text for text in pages), "PDF contains replacement characters")
+    notes_start = next(entry[2] - 1 for entry in toc if entry[1] == "關於本版")
+    notes_end = next(entry[2] - 1 for entry in toc if entry[0] == 1 and entry[2] - 1 > notes_start)
+    presentation_checks(config, pages[0], "\n".join(pages[notes_start:notes_end]),
+                        {link["uri"] for page in document.pages(notes_start, notes_end)
+                         for link in page.get_links() if "uri" in link})
+    for page in document.pages(1, notes_start):
+        for block in page.get_text("dict")["blocks"]:
+            if block["type"] == 0:
+                require(all(span["color"] == 0 for line in block["lines"] for span in line["spans"]
+                            if span["text"].strip()), "PDF table of contents is not black")
+    require(all("原著內容依" not in text and "正體中文翻譯(非官方)" not in re.sub(r"\s+", "", text)
+                for text in pages), "Obsolete PDF chapter note/header")
     links = 0
     example_citation = False
     for number, page in enumerate(document):
@@ -105,7 +159,10 @@ def pdf_checks(path: Path, inventory: dict, render: bool) -> dict:
     require(example_citation, "Expected clickable chapter-6 citation [111]")
     require(sum(len(page.get_images()) for page in document) == 49, "PDF figure inventory changed; review expected count")
     start = next(entry[2] - 1 for entry in toc if entry[1] == "參考文獻")
-    end = next(entry[2] - 1 for entry in toc if entry[1] == "授權條款")
+    end = next(entry[2] - 1 for entry in toc if entry[0] == 1 and entry[2] - 1 > start)
+    top_level = [entry for entry in toc if entry[0] == 1]
+    require(top_level[-4][1] == "參考文獻" and all(entry[1].startswith(f"附錄 {letter}")
+                for entry, letter in zip(top_level[-3:], "ABC")), "PDF references must precede appendices A-C")
     labels = [int(x) for x in re.findall(r"\[(\d+)\]", "\n".join(pages[start:end]))]
     require(labels == list(range(1, inventory["references"] + 1)), "PDF bibliography incomplete")
     equation_labels = {int(x) for x in re.findall(r"\((\d+)\)", "\n".join(pages))}
@@ -123,13 +180,16 @@ def pdf_checks(path: Path, inventory: dict, render: bool) -> dict:
             "references": len(labels), "numbered_equations": len(inventory["equation_numbers"])}
 
 
-def epub_layout_checks(path: Path, render: bool) -> dict:
+def epub_layout_checks(path: Path, render: bool, viewport: tuple[int, int] = (400, 600)) -> dict:
     import pymupdf
     document = pymupdf.open(path)
+    document.layout(width=viewport[0], height=viewport[1])
     directory = ROOT / "tmp/pdfs/qa"
     if render:
         directory.mkdir(parents=True, exist_ok=True)
     checked = 0
+    selected = {0, 1}
+    selected.update(entry[2] - 1 for entry in document.get_toc() if entry[1] == "關於本版")
     for number, page in enumerate(document):
         blocks = page.get_text("dict")["blocks"]
         images = [pymupdf.Rect(block["bbox"]) for block in blocks if block["type"] == 1
@@ -144,9 +204,9 @@ def epub_layout_checks(path: Path, render: bool) -> dict:
                     overlap = image & pymupdf.Rect(line["bbox"])
                     require(overlap.height <= 3 or overlap.width <= 5,
                             f"EPUB large image/formula overlaps text on reflow page {number + 1}")
-        if render and (number == 0 or any(f"({n})" in page.get_text().splitlines() for n in (15, 57, 78, 80, 81))):
-            page.get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).save(directory / f"epub-{number + 1:03}.png")
-    return {"reader": f"MuPDF {pymupdf.VersionBind}", "viewport": "400x600 default",
+        if render and (number in selected or any(f"({n})" in page.get_text().splitlines() for n in (15, 57, 78, 80, 81))):
+            page.get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).save(directory / f"epub-{viewport[0]}x{viewport[1]}-{number + 1:03}.png")
+    return {"reader": f"MuPDF {pymupdf.VersionBind}", "viewport": f"{viewport[0]}x{viewport[1]}",
             "large_images_checked": checked, "large_image_text_overlaps": 0}
 
 
@@ -164,10 +224,11 @@ def main():
     for format, path in paths.items():
         require(hashlib.sha256(path.read_bytes()).hexdigest() == provenance.get("artifacts", {}).get(format, {}).get("sha256"),
                 f"{format} does not match the successful build report; rebuild both formats")
-    report = {"epub": epub_checks(paths["epub"], provenance["inventory"]),
-              "pdf": pdf_checks(paths["pdf"], provenance["inventory"], args.render),
+    report = {"epub": epub_checks(paths["epub"], provenance["inventory"], config),
+              "pdf": pdf_checks(paths["pdf"], provenance["inventory"], args.render, config),
               "source_commit": provenance["source_commit"], "visual_review": "manual review required; not implied by automated checks"}
     report["epub"]["reflow_check"] = epub_layout_checks(paths["epub"], args.render)
+    report["epub"]["landscape_check"] = epub_layout_checks(paths["epub"], args.render, (600, 400))
     for format, path in paths.items():
         report[format]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         report[format]["bytes"] = path.stat().st_size

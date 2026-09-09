@@ -181,7 +181,7 @@ def frontmatter(config: dict, info: dict) -> str:
 - **版本**：{config["version"]}；輸出日期：{info["build_date"]}。
 - **授權**：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant)。
 
-本版以 [Twinkle AI Community](https://github.com/ai-twinkle/rlhf-book-zh-tw) 內容為基礎，加入電子書排版、文獻與公式跳轉。
+本版以 [Twinkle AI Community](https://apps.twinkleai.tw/rlhf-book-zh-tw/) 內容為基礎，加入電子書排版、文獻與公式跳轉。
 
 本書保留原有章節、插圖與公式編號。網頁互動實驗不嵌入電子書，可至[線上閱讀網站]({config["website"]})使用；網站與電子書的更新可能不同步。
 
@@ -192,7 +192,7 @@ def frontmatter(config: dict, info: dict) -> str:
 
 def prepare(config: dict, info: dict) -> tuple[str, dict]:
     chapters = config["chapters"]
-    expected = [f"ch{i:02}" for i in range(1, 18)] + ["appa", "appb", "appc", "bibliography"]
+    expected = [f"ch{i:02}" for i in range(1, 18)] + ["bibliography", "appa", "appb", "appc"]
     if chapters != expected:
         raise ValueError("Chapter manifest must include each full chapter exactly once")
     sources = {name: (CONTENT / f"{name}.md").read_text(encoding="utf-8") for name in chapters}
@@ -205,9 +205,11 @@ def prepare(config: dict, info: dict) -> tuple[str, dict]:
     if len(set(numbers)) != len(numbers):
         raise ValueError("Duplicate equation numbers")
     parts = [frontmatter(config, info)]
-    for chapter in chapters[:-1]:
-        parts.append(prepare_chapter(sources[chapter], chapter, set(entries), set(numbers)))
-    parts.append(bibliography_markdown(entries))
+    for chapter in chapters:
+        if chapter == "bibliography":
+            parts.append(bibliography_markdown(entries))
+        else:
+            parts.append(prepare_chapter(sources[chapter], chapter, set(entries), set(numbers)))
     stats = {"chapters": chapters, "references": len(entries), "numbered_equations": len(numbers),
              "equation_numbers": sorted(numbers)}
     return "\n\n".join(parts), stats
@@ -329,7 +331,7 @@ def main() -> int:
     meta.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
     ast_path = WORK / "manuscript.json"
     ast_path.write_text(json.dumps(ast, ensure_ascii=False), encoding="utf-8")
-    common = [pandoc, "--from=json", "--standalone", "--toc", "--toc-depth=2",
+    common = [pandoc, "--from=json", "--standalone", "--toc", "--toc-depth=3",
               "--data-dir=" + str(ROOT / "templates"),
               "--resource-path=" + str(CONTENT), "--metadata-file=" + str(meta),
               "--syntax-highlighting=none"]
@@ -342,6 +344,7 @@ def main() -> int:
         output = ROOT / "output" / "epub" / f"{stem}.epub"
         output.parent.mkdir(parents=True, exist_ok=True)
         run(common + ["--to=epub3", "--split-level=1",
+                      "--template=" + str(ROOT / "templates" / "epub.html"),
                       "--css=" + str(ROOT / "templates" / "epub.css"), "--output=" + str(output)],
             data=json.dumps(epub, ensure_ascii=False))
         print(f"Created {output}")

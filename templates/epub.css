@@ -19,4 +19,22 @@ math { font-size: 0.95em; }
 .math-inline, .math-display { height: auto; max-width: 100%; }
 .math-display { margin: 0.4em auto; vertical-align: baseline; }
 .reference { font-size: 0.9em; text-align: left; overflow-wrap: anywhere; margin-bottom: 0.8em; }
-.titlepage { text-align: center; padding-top: 3em; }
+nav { text-align: left; }
+nav a { color: #000; text-decoration: none; }
+nav ol { list-style: none; padding-left: 1.2em; }
+nav > ol { padding-left: 0; }
+nav li { margin: 0.45em 0; }
+.titlepage { text-align: left; padding-top: 1em; color: #172c38; line-height: 1.35; }
+.cover-rule { width: 2.5em; border-top: 2px solid #146c70; margin-bottom: 0.8em; }
+.titlepage .title { font-size: 1em; margin: 0; line-height: 1.3; }
+.cover-acronym { display: block; font-family: sans-serif; font-size: 4.5em; line-height: 1.1; }
+.cover-chinese { display: block; font-size: 1.45em; margin-top: 0.45em; }
+.titlepage .subtitle { font-size: 0.9em; color: #5b6970; margin: 0.6em 0; }
+.cover-edition { font-size: 0.8em; color: #146c70; margin: 0.6em 0 0; }
+.cover-english { max-width: 12em; font-size: 1.5em; line-height: 1.25; margin: 1.3em 0 0.45em; }
+.cover-description { font-family: sans-serif; font-size: 0.85em; color: #5b6970; margin: 0; }
+.cover-credits { font-family: sans-serif; margin-top: 2em; break-inside: avoid; }
+.credit-label { display: block; font-size: 0.72em; color: #5b6970; margin-bottom: 0.25em; }
+.cover-author { font-size: 1.2em; margin: 0 0 0.8em; }
+.cover-credit { display: inline-block; vertical-align: top; width: 48%; margin-bottom: 0.65em; font-size: 0.85em; }
+.cover-meta { border-top: 1px solid #cbd4d5; padding-top: 0.7em; margin-top: 1.4em; font-family: sans-serif; font-size: 0.7em; color: #5b6970; }

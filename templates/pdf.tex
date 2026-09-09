@@ -23,7 +23,7 @@
 \hypersetup{unicode=true,colorlinks=true,linkcolor=BookTeal,urlcolor=BookTeal,
   pdftitle={$title$},pdfauthor={$author$}}
 \setcounter{secnumdepth}{-2}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \renewcommand{\contentsname}{目錄}
 \renewcommand{\figurename}{圖}
 \renewcommand{\tablename}{表}
@@ -89,7 +89,11 @@ $edition$\quad /\quad $date$\hfill CC BY-NC-SA 4.0}\par
 \vspace*{2mm}
 \end{titlepage}
 \frontmatter
+\begingroup
+\hypersetup{linkcolor=black}
 \tableofcontents
+\clearpage
+\endgroup
 \mainmatter
 $body$
 \end{document}

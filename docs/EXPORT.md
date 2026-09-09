@@ -52,9 +52,10 @@ python scripts/export_book.py --prepare-only # 只組稿並檢查編號
 
 ## 3. 內容如何轉換
 
-- 收錄第 1–17 章、附錄 A–C、參考文獻；第 6 章只用完整 `ch06.md`，不加入 `ch06a.md`／`ch06b.md`。輸出時移除合併稿中重複的第 6 章標題及每章舊來源註記，來源版本記錄於 README 與建置紀錄。
+- 依序收錄第 1–17 章、參考文獻、附錄 A–C；第 6 章只用完整 `ch06.md`，不加入 `ch06a.md`／`ch06b.md`。輸出時移除合併稿中重複的第 6 章標題及每章舊來源註記，來源版本記錄於 README 與建置紀錄。
 - 保留既有的 409 筆參考文獻、158 個公式編號與插圖內容，不重新編號。引用 `[N]` 及「式 N」變成內部連結；不重寫程式碼、數學內容或既有 Markdown 連結。DOI 條目增加可跳轉 URL。
 - PDF 交由 Pandoc 與 XeLaTeX 排版；EPUB 公式由 MathJax 轉為內嵌 SVG，避免閱讀器不支援 MathML 而顯示原始 TeX。SVG 使用局部字形快取，離線可用；原始 TeX 保留在替代文字中。
+- PDF 與 EPUB 使用黑色目錄，顯示章、節與小節三級（例如 1.6.1）；封面保留中英文書名、副標與作者、譯者資訊。
 - 電子書不包含網站的互動實驗。PDF／EPUB 與既有 Pages 是不同發布管線，不會自動同步。
 - 書內〈關於本版〉保留授權連結；完整授權條款與工具、字型署名保留於 repo 的 `LICENSE` 與 `licenses/`，不另收錄為電子書章節。
 
@@ -82,9 +83,9 @@ python scripts/export_book.py
 1. 單元測試：保護程式碼與公式、引用與公式的遺失目標、文獻編號重複、章節清單及第 6 章去重、SVG 公式編號、DOI 連結。
 2. EPUB：ZIP／XML、章節及每個文獻／公式 ID、內部連結與圖片資源、公式數量、原插圖雜湊，以及 EPUBCheck 零錯誤、零警告。另用 MuPDF 重排全書，檢查大型公式／插圖不與文字重疊。
 3. PDF：章節書籤、每筆內部連結有有效目標頁、參考文獻完整性、公式編號、替代字元與頁邊越界。回歸案例核對 `[111]` 指向 Ahmadian 的條目。
-4. 人工視覺檢查：`--render` 將 PDF 封面、目錄、各章起始頁、第 6／8 章公式頁及 EPUB 的多行公式頁輸出到 `tmp/pdfs/qa/`。另抽查長表格、程式碼、授權頁及 EPUB 橫直向顯示；程式通過不代表排版或數學語義已全部審校。
+4. 人工視覺檢查：`--render` 將 PDF 封面、目錄、各章起始頁、第 6／8 章公式頁及 EPUB 的多行公式頁輸出到 `tmp/pdfs/qa/`。另抽查長表格、程式碼、〈關於本版〉及 EPUB 橫直向顯示；程式通過不代表排版或數學語義已全部審校。
 
-檢查結果寫入 `output/validation.json`，檔案雜湊寫入 `output/SHA256SUMS.txt`。發布前先 commit 書稿與建置工具，再於乾淨工作目錄重建，執行 `validate_exports.py --release --render`，確保書內 commit 可追溯。
+檢查結果寫入 `output/validation.json`，檔案雜湊寫入 `output/SHA256SUMS.txt`。發布前先 commit 書稿與建置工具，再於乾淨工作目錄重建，執行 `validate_exports.py --release --render`，確保建置紀錄的 commit 可追溯。
 
 PDF／EPUB、provenance 與 SHA256SUMS 適合放入 GitHub Release；不要將下載工具、中間檔或本機 `AGENTS.md` 提交至 repo。是否發布由維護者決定，腳本不會自動執行 GitHub 寫入。
 
